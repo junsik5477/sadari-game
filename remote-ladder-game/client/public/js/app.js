@@ -67,8 +67,14 @@ function connectSocket() {
         updateParticipantsList(room.participants);
         updateDestinationsList(room.destinations);
         
+        // 호스트인지 확인하여 컨트롤 표시
+        if (room.hostId === socket.id) {
+            displays.hostControls.classList.remove('hidden');
+            displays.waitingMessage.classList.add('hidden');
+        }
+        
         if (room.status === 'playing' && !ladderData) {
-            // 게임이 시작된 경우
+            // 게임이 시작된 경우 - game-started 이벤트에서 처리
         }
     });
 
@@ -77,7 +83,10 @@ function connectSocket() {
         participants = roomParticipants;
         destinations = roomDestinations;
         showScreen('game');
-        drawLadder(ladder, roomParticipants, roomDestinations);
+        // 약간의 지연 후 사다리 그리기 (화면 전환 완료 후)
+        setTimeout(() => {
+            drawLadder(ladder, roomParticipants, roomDestinations);
+        }, 100);
     });
 
     socket.on('game-finished', ({ results }) => {
